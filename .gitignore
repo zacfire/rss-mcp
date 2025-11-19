@@ -3,6 +3,11 @@
 
 # Build output
 /dist
+/.next
+/out
+
+# Next.js
+next-env.d.ts
 
 # Logs
 logs
