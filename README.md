@@ -225,7 +225,7 @@ rss-mcp/
 ├── app/
 │   ├── api/
 │   │   └── [transport]/
-│   │       └── route.ts        # MCP handler for Vercel
+│   │       └── route.ts        # MCP handler with maxDuration config
 │   ├── layout.tsx              # Root layout
 │   └── page.tsx                # Homepage with API documentation
 ├── src/
@@ -235,9 +235,10 @@ rss-mcp/
 │   │   ├── types.ts            # TypeScript types
 │   │   └── index.ts            # Module exports
 │   └── index.ts                # stdio server entry point
+├── public/
+│   └── .gitkeep                # Keep public directory in git
 ├── .env.example
-├── next.config.js
-├── vercel.json
+├── next.config.mjs             # Next.js configuration
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -303,8 +304,8 @@ Use the rss tool to get the feed from: rsshub://github/issue/anthropics/anthropi
 
 **Error: "Function timeout"**
 - Some RSS feeds may take longer to fetch
-- The `vercel.json` already sets `maxDuration: 60` seconds
-- For Vercel Pro accounts, you can increase this limit
+- The route handler exports `maxDuration: 60` seconds by default
+- For Vercel Pro accounts, you can increase this limit in `app/api/[transport]/route.ts`
 
 ### MCP Connection Issues
 
