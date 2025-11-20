@@ -2,6 +2,9 @@ import { createMcpHandler } from 'mcp-handler';
 import { z } from 'zod';
 import { getFeed } from '../../../src/lib';
 
+// Configure route segment runtime
+export const maxDuration = 60; // Maximum duration in seconds for Vercel
+
 const handler = createMcpHandler(
   (server) => {
     server.tool(
