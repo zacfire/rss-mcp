@@ -1,4 +1,6 @@
 {
+  "buildCommand": "next build",
+  "framework": "nextjs",
   "functions": {
     "app/api/[transport]/route.ts": {
       "maxDuration": 60

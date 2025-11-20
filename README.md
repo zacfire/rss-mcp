@@ -20,34 +20,68 @@ A Model Context Protocol (MCP) server for fetching and parsing RSS/Atom feeds wi
 
 ### Option 1: Deploy to Vercel (Recommended)
 
-Deploy your own RSS MCP server to Vercel with one click:
+#### Method A: One-Click Deploy
+
+Deploy with a single click using Vercel's deployment button:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/zacfire/rss-mcp)
 
-Or deploy manually:
+#### Method B: Deploy via Vercel Dashboard
+
+1. Visit [Vercel Dashboard](https://vercel.com/new)
+2. Click "Import Project"
+3. Connect your GitHub account and select the `zacfire/rss-mcp` repository
+4. Select the branch you want to deploy (e.g., `main` or your feature branch)
+5. Vercel will auto-detect Next.js settings
+6. Click "Deploy"
+7. Wait for deployment to complete (usually 1-2 minutes)
+
+After deployment, you'll get:
+- **Production URL**: `https://your-project-name.vercel.app`
+- **MCP Endpoint**: `https://your-project-name.vercel.app/api`
+
+**Benefits of Dashboard Deployment:**
+- Auto-deploys on every push to the connected branch
+- Preview deployments for pull requests
+- Easy environment variable management
+- Deployment history and rollback support
+
+#### Method C: Deploy via CLI
+
+For manual deployment from your local machine:
 
 ```bash
-# Clone the repository
+# 1. Clone the repository (if not already cloned)
 git clone https://github.com/zacfire/rss-mcp.git
 cd rss-mcp
 
-# Install dependencies
-npm install
+# 2. Install Vercel CLI globally (first time only)
+npm install -g vercel
 
-# Deploy to Vercel
-npx vercel
+# 3. Login to Vercel
+vercel login
 
-# Or deploy to production
-npx vercel --prod
+# 4. Deploy to preview environment
+vercel
+
+# 5. Deploy to production
+vercel --prod
 ```
 
-After deployment, you'll get an HTTPS URL like: `https://your-rss-mcp.vercel.app`
+#### Setting Environment Variables
 
-#### Environment Variables (Optional)
+In your Vercel project settings, you can optionally set:
 
-In your Vercel project settings, you can set:
+- **`PRIORITY_RSSHUB_INSTANCE`**: Your preferred RSSHub instance URL
+  - Example: `https://my-rsshub.example.com`
+  - This instance will be tried first before falling back to public instances
 
-- `PRIORITY_RSSHUB_INSTANCE`: Your preferred RSSHub instance URL (e.g., `https://my-rsshub.example.com`)
+**How to set environment variables:**
+1. Go to your project in Vercel Dashboard
+2. Navigate to Settings → Environment Variables
+3. Add `PRIORITY_RSSHUB_INSTANCE` with your value
+4. Select environment (Production, Preview, Development)
+5. Click "Save" - this will trigger a new deployment
 
 ### Option 2: Run Locally via stdio
 
@@ -219,6 +253,87 @@ rss-mcp/
 - [cheerio](https://www.npmjs.com/package/cheerio): HTML parser for content cleaning
 - [date-fns-tz](https://www.npmjs.com/package/date-fns-tz): Timezone-aware date formatting
 - [zod](https://www.npmjs.com/package/zod): Schema validation
+
+## Verifying Your Deployment
+
+After deploying to Vercel, verify that everything works:
+
+### 1. Check the Homepage
+
+Visit your deployment URL (e.g., `https://your-project-name.vercel.app`)
+
+You should see:
+- Server name and description
+- MCP endpoint URL
+- Available tools documentation
+- Client configuration examples
+
+### 2. Test the MCP Endpoint
+
+The MCP endpoint is available at: `https://your-project-name.vercel.app/api`
+
+You can test it by:
+1. Adding it to your MCP client configuration (Cursor or Claude Desktop)
+2. Trying the `get_feed` tool with a test URL
+
+### 3. Example Test
+
+In Cursor or Claude Desktop, try:
+```
+Use the rss tool to get the feed from: rsshub://github/issue/anthropics/anthropic-sdk-typescript
+```
+
+## Troubleshooting
+
+### Vercel Deployment Issues
+
+**Error: "No Output Directory named 'public' found"**
+- Solution: The `public` directory should be auto-created. If missing, run:
+  ```bash
+  mkdir public
+  git add public
+  git commit -m "Add public directory"
+  git push
+  ```
+
+**Error: "Build failed" or TypeScript errors**
+- Check the build logs in Vercel Dashboard
+- Ensure all dependencies are installed: `npm install`
+- Test locally first: `npm run build`
+
+**Error: "Function timeout"**
+- Some RSS feeds may take longer to fetch
+- The `vercel.json` already sets `maxDuration: 60` seconds
+- For Vercel Pro accounts, you can increase this limit
+
+### MCP Connection Issues
+
+**Client can't connect to the server**
+- Verify the URL is correct: `https://your-project-name.vercel.app/api`
+- Check that the deployment is live (visit the URL in browser)
+- For Claude Desktop, ensure `mcp-remote` is installed: `npx mcp-remote --version`
+
+**Tool returns errors**
+- Check Vercel function logs in Dashboard → Deployments → [Latest] → Functions
+- Verify the RSS/RSSHub URL is accessible
+- Try a different RSSHub instance by setting `PRIORITY_RSSHUB_INSTANCE`
+
+### Local Development Issues
+
+**Port 3000 already in use**
+- Change the port: `PORT=3001 npm run dev`
+- Or kill the process using port 3000
+
+**TypeScript errors during development**
+- Run `npm install` to ensure all type definitions are installed
+- Check that `tsconfig.json` is properly configured
+
+## Performance Notes
+
+- **Cold Starts**: First request after inactivity may take 2-3 seconds (Vercel serverless warm-up)
+- **Timeout**: RSS fetching has a 15-second timeout per instance, 60-second function limit
+- **RSSHub Fallback**: If one instance fails, it automatically tries the next one
+- **Caching**: Consider implementing caching for frequently accessed feeds
 
 ## License
 
