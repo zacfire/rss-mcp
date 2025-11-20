@@ -225,7 +225,7 @@ rss-mcp/
 ├── app/
 │   ├── api/
 │   │   └── [transport]/
-│   │       └── route.ts        # MCP handler with maxDuration config
+│   │       └── route.ts        # MCP handler (required dynamic route)
 │   ├── layout.tsx              # Root layout
 │   └── page.tsx                # Homepage with API documentation
 ├── src/
@@ -304,8 +304,8 @@ Use the rss tool to get the feed from: rsshub://github/issue/anthropics/anthropi
 
 **Error: "Function timeout"**
 - Some RSS feeds may take longer to fetch
-- The route handler exports `maxDuration: 60` seconds by default
-- For Vercel Pro accounts, you can increase this limit in `app/api/[transport]/route.ts`
+- The route handler uses `maxDuration: 60` seconds by default
+- For Vercel Pro accounts, you can increase this limit in the mcp-handler options
 
 ### MCP Connection Issues
 
