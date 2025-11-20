@@ -2,111 +2,171 @@
 
 [![NPM Version](https://img.shields.io/npm/v/rss-mcp.svg)](https://www.npmjs.com/package/rss-mcp)
 
-This is a Model Context Protocol (MCP) server built with TypeScript. It provides a versatile tool to fetch and parse any standard RSS/Atom feed, and also includes special support for [RSSHub](https://docs.rsshub.app/) feeds. With this server, language models or other MCP clients can easily retrieve structured content from various web sources.
+A Model Context Protocol (MCP) server for fetching and parsing RSS/Atom feeds with RSSHub support. This server can be deployed to Vercel as a remote MCP server or run locally via stdio.
 
-The server comes with a built-in list of public RSSHub instances and supports a polling mechanism to automatically select an available instance, significantly improving the success rate and stability of data retrieval.
-
-## ✨ Features
+## Features
 
 - **Universal Feed Parsing**: Fetch and parse any standard RSS/Atom feed from a given URL.
-- **Enhanced RSSHub Support**: Provides a tool named `get_feed` to fetch any RSSHub-supported feed via MCP, with multi-instance support.
+- **Enhanced RSSHub Support**: Fetch any RSSHub-supported feed via MCP, with multi-instance support.
 - **Customizable Item Count**: Specify the number of feed items to retrieve, with support for fetching all items.
 - **Multi-instance Support**: Includes a list of public RSSHub instances and automatically polls to find an available service.
 - **Smart URL Parsing**: Supports standard RSSHub URLs and a simplified `rsshub://` protocol format.
-- **Priority Instance Configuration**: Allows setting a preferred RSSHub instance via the `PRIORITY_RSSHUB_INSTANCE` environment variable.
-- **Robust Error Handling**: If a request to one instance fails, it automatically tries the next one until it succeeds or all instances have failed.
+- **Priority Instance Configuration**: Set a preferred RSSHub instance via the `PRIORITY_RSSHUB_INSTANCE` environment variable.
+- **Robust Error Handling**: If a request to one instance fails, it automatically tries the next one until it succeeds.
 - **Content Cleaning**: Uses Cheerio to clean the feed content and extract plain text descriptions.
-- **Standardized Output**: Converts the fetched RSS feed into a structured JSON format.
+- **Vercel Deployment**: Deploy as a remote MCP server accessible via HTTPS.
 
-## 📦 Installation
+## Deployment Options
 
-First, clone the project repository, then install the required dependencies.
+### Option 1: Deploy to Vercel (Recommended)
+
+#### Method A: One-Click Deploy
+
+Deploy with a single click using Vercel's deployment button:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/zacfire/rss-mcp)
+
+#### Method B: Deploy via Vercel Dashboard
+
+1. Visit [Vercel Dashboard](https://vercel.com/new)
+2. Click "Import Project"
+3. Connect your GitHub account and select the `zacfire/rss-mcp` repository
+4. Select the branch you want to deploy (e.g., `main` or your feature branch)
+5. Vercel will auto-detect Next.js settings
+6. Click "Deploy"
+7. Wait for deployment to complete (usually 1-2 minutes)
+
+After deployment, you'll get:
+- **Production URL**: `https://your-project-name.vercel.app`
+- **MCP Endpoint**: `https://your-project-name.vercel.app/api`
+
+**Benefits of Dashboard Deployment:**
+- Auto-deploys on every push to the connected branch
+- Preview deployments for pull requests
+- Easy environment variable management
+- Deployment history and rollback support
+
+#### Method C: Deploy via CLI
+
+For manual deployment from your local machine:
 
 ```bash
-git clone https://github.com/veithly/rss-mcp.git
+# 1. Clone the repository (if not already cloned)
+git clone https://github.com/zacfire/rss-mcp.git
+cd rss-mcp
+
+# 2. Install Vercel CLI globally (first time only)
+npm install -g vercel
+
+# 3. Login to Vercel
+vercel login
+
+# 4. Deploy to preview environment
+vercel
+
+# 5. Deploy to production
+vercel --prod
+```
+
+#### Setting Environment Variables
+
+In your Vercel project settings, you can optionally set:
+
+- **`PRIORITY_RSSHUB_INSTANCE`**: Your preferred RSSHub instance URL
+  - Example: `https://my-rsshub.example.com`
+  - This instance will be tried first before falling back to public instances
+
+**How to set environment variables:**
+1. Go to your project in Vercel Dashboard
+2. Navigate to Settings → Environment Variables
+3. Add `PRIORITY_RSSHUB_INSTANCE` with your value
+4. Select environment (Production, Preview, Development)
+5. Click "Save" - this will trigger a new deployment
+
+### Option 2: Run Locally via stdio
+
+For local development or traditional MCP usage:
+
+```bash
+# Clone and install
+git clone https://github.com/zacfire/rss-mcp.git
 cd rss-mcp
 npm install
+
+# Build for stdio mode
+npm run build:stdio
+
+# Run the server
+npm run start:stdio
 ```
 
-## 🚀 Usage
-
-### 1. Build the Project
-
-Before running, you need to compile the TypeScript code into JavaScript:
+### Option 3: Use via npx
 
 ```bash
-npm run build
+npx rss-mcp
 ```
 
-### 2. Run the Server
+## MCP Client Configuration
 
-After a successful build, start the MCP server:
+### For Cursor (Remote Server)
 
-```bash
-npm start
-```
+Add to your Cursor settings (`~/.cursor/mcp.json`):
 
-The server will then communicate with the parent process (e.g., Cursor) via Stdio.
-
-### 3. Configure a Priority Instance (Optional)
-
-You can create a `.env` file to specify a priority RSSHub instance. This is very useful for users who have a private, stable instance.
-
-Create a `.env` file in the project root directory and add the following content:
-
-```env
-PRIORITY_RSSHUB_INSTANCE=https://my-rsshub.example.com
-```
-
-The server will automatically load this configuration on startup and place it at the top of the polling list.
-
-## 🔧 MCP Server Configuration
-
-To use this server with an MCP client like Cursor, you need to add it to your configuration file.
-
-### Method 1: Using `npx` (Recommended)
-
-This package is published on npm, so you can use `npx` to run the server without a local installation. This is the easiest method.
-
-1.  **Direct Invocation**:
-    You can run the server directly from your terminal using `npx`:
-
-    ```bash
-    npx rss-mcp
-    ```
-
-2.  **MCP Client Configuration**:
-    To integrate with an MCP client like Cursor, add the following to your configuration file (e.g., `~/.cursor/mcp_settings.json`):
-
-    ```json
-    {
-      "name": "rss",
-      "command": ["npx", "rss-mcp"],
-      "type": "stdio"
+```json
+{
+  "mcpServers": {
+    "rss": {
+      "url": "https://your-rss-mcp.vercel.app/api"
     }
-    ```
+  }
+}
+```
 
-### Method 2: Local Installation
+### For Claude Desktop (Remote Server)
 
-If you have cloned the repository locally, you can run it directly with `node`.
+Claude Desktop requires `mcp-remote` to connect to remote servers. Add to your Claude Desktop config:
 
-1.  **Clone and build the project** as described in the "Installation" and "Usage" sections.
-2.  **Locate your MCP configuration file.**
-3.  Add the following server entry, making sure to use the **absolute path** to the compiled `index.js` file:
-
-    ```json
-    {
-      "name": "rss",
-      "command": ["node", "/path/to/your/rss-mcp/dist/index.js"],
-      "type": "stdio"
+```json
+{
+  "mcpServers": {
+    "rss": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://your-rss-mcp.vercel.app/api"
+      ]
     }
-    ```
+  }
+}
+```
 
-    **Important:** Replace `/path/to/your/rss-mcp/dist/index.js` with the correct absolute path on your system.
+### For Local stdio Mode
 
-After adding the configuration, **restart your MCP client** (e.g., Cursor) for the changes to take effect. The `rss` server will then be available, and you can call the `get_feed` tool.
+```json
+{
+  "mcpServers": {
+    "rss": {
+      "command": "npx",
+      "args": ["rss-mcp"]
+    }
+  }
+}
+```
 
-## 🛠️ Tool Definition
+Or with a local installation:
+
+```json
+{
+  "mcpServers": {
+    "rss": {
+      "command": "node",
+      "args": ["/path/to/your/rss-mcp/dist/index.js"]
+    }
+  }
+}
+```
+
+## Tool Definition
 
 ### `get_feed`
 
@@ -114,16 +174,17 @@ Fetches and parses an RSS feed from a given URL. It supports both standard RSS/A
 
 #### Input Parameters
 
-- `url` (string, required): The URL of the RSS feed to fetch. Two formats are supported:
-    1.  **Standard URL**: `https://rsshub.app/bilibili/user/dynamic/208259`
-    2.  **`rsshub://` protocol**: `rsshub://bilibili/user/dynamic/208259` (the server will automatically match an available instance)
+- `url` (string, required): The URL of the RSS feed to fetch. Supported formats:
+    1. **Standard URL**: `https://rsshub.app/bilibili/user/dynamic/208259`
+    2. **`rsshub://` protocol**: `rsshub://bilibili/user/dynamic/208259`
+    3. **Short path**: `bilibili/user/dynamic/208259` (automatically converted to rsshub://)
 - `count` (number, optional): The number of RSS feed items to retrieve.
     - **Default**: `1`
     - **Retrieve all**: `0`
 
 #### Output
 
-Returns a JSON string containing the feed information, with the following structure:
+Returns a JSON string containing the feed information:
 
 ```json
 {
@@ -144,15 +205,136 @@ Returns a JSON string containing the feed information, with the following struct
 }
 ```
 
-## 📜 Main Dependencies
+## Local Development
 
-- [@modelcontextprotocol/sdk](https://www.npmjs.com/package/@modelcontextprotocol/sdk): For building the MCP server.
-- [axios](https://www.npmjs.com/package/axios): For making HTTP requests.
-- [rss-parser](https://www.npmjs.com/package/rss-parser): For parsing RSS/Atom feeds.
-- [cheerio](https://www.npmjs.com/package/cheerio): For parsing and manipulating HTML content.
-- [date-fns-tz](https://www.npmjs.com/package/date-fns-tz): For handling time-zone-related date formatting.
-- [dotenv](https://www.npmjs.com/package/dotenv): For loading environment variables from a `.env` file.
+```bash
+# Install dependencies
+npm install
 
-## 📄 License
+# Run development server
+npm run dev
+
+# The server will be available at http://localhost:3000
+# MCP endpoint: http://localhost:3000/api
+```
+
+## Project Structure
+
+```
+rss-mcp/
+├── app/
+│   ├── api/
+│   │   └── [transport]/
+│   │       └── route.ts        # MCP handler for Vercel
+│   ├── layout.tsx              # Root layout
+│   └── page.tsx                # Homepage with API documentation
+├── src/
+│   ├── lib/
+│   │   ├── feed-parser.ts      # Core RSS parsing logic
+│   │   ├── rsshub-instances.ts # RSSHub instance management
+│   │   ├── types.ts            # TypeScript types
+│   │   └── index.ts            # Module exports
+│   └── index.ts                # stdio server entry point
+├── .env.example
+├── next.config.js
+├── vercel.json
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
+## Main Dependencies
+
+- [mcp-handler](https://www.npmjs.com/package/mcp-handler): Vercel adapter for MCP servers
+- [@modelcontextprotocol/sdk](https://www.npmjs.com/package/@modelcontextprotocol/sdk): MCP SDK
+- [next](https://www.npmjs.com/package/next): React framework for production
+- [axios](https://www.npmjs.com/package/axios): HTTP client
+- [rss-parser](https://www.npmjs.com/package/rss-parser): RSS/Atom feed parser
+- [cheerio](https://www.npmjs.com/package/cheerio): HTML parser for content cleaning
+- [date-fns-tz](https://www.npmjs.com/package/date-fns-tz): Timezone-aware date formatting
+- [zod](https://www.npmjs.com/package/zod): Schema validation
+
+## Verifying Your Deployment
+
+After deploying to Vercel, verify that everything works:
+
+### 1. Check the Homepage
+
+Visit your deployment URL (e.g., `https://your-project-name.vercel.app`)
+
+You should see:
+- Server name and description
+- MCP endpoint URL
+- Available tools documentation
+- Client configuration examples
+
+### 2. Test the MCP Endpoint
+
+The MCP endpoint is available at: `https://your-project-name.vercel.app/api`
+
+You can test it by:
+1. Adding it to your MCP client configuration (Cursor or Claude Desktop)
+2. Trying the `get_feed` tool with a test URL
+
+### 3. Example Test
+
+In Cursor or Claude Desktop, try:
+```
+Use the rss tool to get the feed from: rsshub://github/issue/anthropics/anthropic-sdk-typescript
+```
+
+## Troubleshooting
+
+### Vercel Deployment Issues
+
+**Error: "No Output Directory named 'public' found"**
+- Solution: The `public` directory should be auto-created. If missing, run:
+  ```bash
+  mkdir public
+  git add public
+  git commit -m "Add public directory"
+  git push
+  ```
+
+**Error: "Build failed" or TypeScript errors**
+- Check the build logs in Vercel Dashboard
+- Ensure all dependencies are installed: `npm install`
+- Test locally first: `npm run build`
+
+**Error: "Function timeout"**
+- Some RSS feeds may take longer to fetch
+- The `vercel.json` already sets `maxDuration: 60` seconds
+- For Vercel Pro accounts, you can increase this limit
+
+### MCP Connection Issues
+
+**Client can't connect to the server**
+- Verify the URL is correct: `https://your-project-name.vercel.app/api`
+- Check that the deployment is live (visit the URL in browser)
+- For Claude Desktop, ensure `mcp-remote` is installed: `npx mcp-remote --version`
+
+**Tool returns errors**
+- Check Vercel function logs in Dashboard → Deployments → [Latest] → Functions
+- Verify the RSS/RSSHub URL is accessible
+- Try a different RSSHub instance by setting `PRIORITY_RSSHUB_INSTANCE`
+
+### Local Development Issues
+
+**Port 3000 already in use**
+- Change the port: `PORT=3001 npm run dev`
+- Or kill the process using port 3000
+
+**TypeScript errors during development**
+- Run `npm install` to ensure all type definitions are installed
+- Check that `tsconfig.json` is properly configured
+
+## Performance Notes
+
+- **Cold Starts**: First request after inactivity may take 2-3 seconds (Vercel serverless warm-up)
+- **Timeout**: RSS fetching has a 15-second timeout per instance, 60-second function limit
+- **RSSHub Fallback**: If one instance fails, it automatically tries the next one
+- **Caching**: Consider implementing caching for frequently accessed feeds
+
+## License
 
 This project is licensed under the Apache-2.0 License.

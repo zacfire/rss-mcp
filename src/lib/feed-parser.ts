@@ -1,0 +1,143 @@
+// Core RSS feed parsing logic
+
+import axios from 'axios';
+import Parser from 'rss-parser';
+import * as cheerio from 'cheerio';
+import { formatInTimeZone } from 'date-fns-tz';
+import { convertRsshubUrl } from './rsshub-instances';
+import { RssFeed, RssItem } from './types';
+
+export interface GetFeedParams {
+    url: string;
+    count?: number;
+}
+
+export async function getFeed(params: GetFeedParams): Promise<RssFeed> {
+    try {
+        let currentUrl = params.url;
+
+        if (typeof currentUrl !== 'string') {
+            throw new Error("URL must be a string.");
+        }
+
+        // Handle JSON string input
+        try {
+            const parsed = JSON.parse(currentUrl);
+            if (parsed && typeof parsed === 'object' && parsed.url) {
+                currentUrl = parsed.url;
+            }
+        } catch {
+            // Not a JSON string, use as is
+        }
+
+        if (!currentUrl.includes('://')) {
+            currentUrl = `rsshub://${currentUrl}`;
+        }
+
+        const urls = convertRsshubUrl(currentUrl);
+
+        const userAgents = [
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0"
+        ];
+
+        const headers = {
+            "User-Agent": userAgents[Math.floor(Math.random() * userAgents.length)],
+            "Accept": "application/rss+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Accept-Encoding": "gzip, deflate, br"
+        };
+
+        let lastError: Error | null = null;
+
+        for (const u of urls) {
+            try {
+                console.log(`Attempting to fetch from ${u}...`);
+                const response = await axios.get(u, {
+                    headers,
+                    timeout: 15000, // Reduced timeout to fail faster
+                    maxRedirects: 3,
+                    validateStatus: (status) => status >= 200 && status < 300,
+                    responseType: 'text', // Ensure response is treated as text
+                });
+
+                if (!response.data) {
+                    throw new Error("Empty response data");
+                }
+
+                const parser = new Parser({
+                    timeout: 10000, // Parser timeout
+                    maxRedirects: 3,
+                });
+                const feed = await parser.parseString(response.data);
+
+                if (!feed || !feed.items) {
+                    throw new Error("Cannot parse RSS feed, feed or feed.items is undefined.");
+                }
+
+                const feedInfo: RssFeed = {
+                    title: feed.title,
+                    link: feed.link,
+                    description: feed.description,
+                    items: []
+                };
+
+                const itemsToProcess = params.count === 0 ? feed.items : feed.items.slice(0, params.count ?? 1);
+
+                for (const item of itemsToProcess) {
+                    let description = '';
+                    if (item.content) {
+                        const $ = cheerio.load(item.content);
+                        description = $.text().replace(/\s+/g, ' ').trim();
+                    } else if (item.contentSnippet) {
+                        description = item.contentSnippet;
+                    }
+
+                    let pubDate: string | undefined = undefined;
+                    if (item.pubDate) {
+                        try {
+                            pubDate = formatInTimeZone(new Date(item.pubDate), 'UTC', "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                        } catch (e) {
+                            console.error(`Date parse error: ${e}`);
+                            pubDate = item.pubDate;
+                        }
+                    }
+
+                    const feedItem: RssItem = {
+                        title: item.title,
+                        description: description,
+                        link: item.link,
+                        guid: item.guid || item.link,
+                        pubDate: pubDate,
+                        author: item.creator,
+                        category: item.categories
+                    };
+                    feedInfo.items.push(feedItem);
+                }
+
+                return feedInfo;
+
+            } catch (error) {
+                lastError = error as Error;
+                const errorMsg = error instanceof Error ? error.message : String(error);
+                console.error(`Attempt to access ${u} failed: ${errorMsg}`);
+
+                // Add a small delay between retries to avoid overwhelming servers
+                if (urls.indexOf(u) < urls.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                continue;
+            }
+        }
+
+        const finalError = lastError?.message || 'Unknown error';
+        console.error(`All RSSHub instances failed. Last error: ${finalError}`);
+        throw new Error(`All RSSHub instances failed: ${finalError}`);
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+        console.error(`Unexpected error in getFeed: ${errorMessage}`);
+        throw error; // Re-throw the error to be caught by the tool handler
+    }
+}
