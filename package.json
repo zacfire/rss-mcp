@@ -25,7 +25,7 @@
   "license": "Apache-2.0",
   "description": "A Model Context Protocol server for fetching and parsing RSS/Atom feeds with RSSHub support",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.13.2",
+    "@modelcontextprotocol/sdk": "^1.22.0",
     "axios": "^1.10.0",
     "cheerio": "^1.1.0",
     "date-fns": "^3.6.0",
