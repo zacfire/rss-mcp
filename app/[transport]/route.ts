@@ -1,6 +1,6 @@
 import { createMcpHandler } from 'mcp-handler';
 import { z } from 'zod';
-import { getFeed } from '../../../src/lib';
+import { getFeed } from '../../src/lib';
 
 const handler = createMcpHandler(
   (server) => {
@@ -32,7 +32,6 @@ const handler = createMcpHandler(
   },
   {},
   {
-    basePath: '/api',
     verboseLogs: true,
     maxDuration: 60
   }
