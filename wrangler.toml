@@ -1,9 +1,6 @@
-{
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "rss-mcp-worker",
-	"main": "workers-rss-mcp/src/index.ts",
-	"compatibility_date": "2024-11-11",
-	"observability": {
-		"enabled": true
-	}
-}
+name = "rss-mcp-worker"
+main = "workers-rss-mcp/src/index.ts"
+compatibility_date = "2024-11-11"
+
+[observability]
+enabled = true
