@@ -26,6 +26,7 @@
   "description": "A Model Context Protocol server for fetching and parsing RSS/Atom feeds with RSSHub support",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.22.0",
+    "agents": "^0.2.23",
     "axios": "^1.10.0",
     "cheerio": "^1.1.0",
     "date-fns": "^3.6.0",
@@ -38,7 +39,8 @@
     "react-dom": "^18.3.1",
     "rss-parser": "^3.13.0",
     "workers-mcp": "^0.0.13",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "zod-to-json-schema": "^3.25.0"
   },
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.16",
