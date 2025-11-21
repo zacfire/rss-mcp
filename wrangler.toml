@@ -3,5 +3,9 @@ main = "workers-rss-mcp/src/index.ts"
 compatibility_date = "2024-11-11"
 compatibility_flags = ["nodejs_compat"]
 
+[[durable_objects.bindings]]
+name = "MCP"
+class_name = "RssMcpServer"
+
 [observability]
 enabled = true
