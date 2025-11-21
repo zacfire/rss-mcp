@@ -1,0 +1,2 @@
+# Ignore Cloudflare Workers directory during Vercel builds
+workers-rss-mcp/
