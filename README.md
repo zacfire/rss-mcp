@@ -38,7 +38,7 @@ Deploy with a single click using Vercel's deployment button:
 
 After deployment, you'll get:
 - **Production URL**: `https://your-project-name.vercel.app`
-- **MCP Endpoint**: `https://your-project-name.vercel.app/api`
+- **MCP Endpoint**: `https://your-project-name.vercel.app` (root path)
 
 **Benefits of Dashboard Deployment:**
 - Auto-deploys on every push to the connected branch
@@ -116,7 +116,7 @@ Add to your Cursor settings (`~/.cursor/mcp.json`):
 {
   "mcpServers": {
     "rss": {
-      "url": "https://your-rss-mcp.vercel.app/api"
+      "url": "https://your-rss-mcp.vercel.app"
     }
   }
 }
@@ -133,7 +133,7 @@ Claude Desktop requires `mcp-remote` to connect to remote servers. Add to your C
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://your-rss-mcp.vercel.app/api"
+        "https://your-rss-mcp.vercel.app"
       ]
     }
   }
@@ -223,9 +223,8 @@ npm run dev
 ```
 rss-mcp/
 ├── app/
-│   ├── api/
-│   │   └── [transport]/
-│   │       └── route.ts        # MCP handler (required dynamic route)
+│   ├── [transport]/
+│   │   └── route.ts            # MCP handler (required dynamic route)
 │   ├── layout.tsx              # Root layout
 │   └── page.tsx                # Homepage with API documentation
 ├── src/
@@ -271,7 +270,7 @@ You should see:
 
 ### 2. Test the MCP Endpoint
 
-The MCP endpoint is available at: `https://your-project-name.vercel.app/api`
+The MCP endpoint is available at: `https://your-project-name.vercel.app` (root path)
 
 You can test it by:
 1. Adding it to your MCP client configuration (Cursor or Claude Desktop)
@@ -310,8 +309,8 @@ Use the rss tool to get the feed from: rsshub://github/issue/anthropics/anthropi
 ### MCP Connection Issues
 
 **Client can't connect to the server**
-- Verify the URL is correct: `https://your-project-name.vercel.app/api`
-- Check that the deployment is live (visit the URL in browser)
+- Verify the URL is correct: `https://your-project-name.vercel.app`
+- Check that the deployment is live (visit the URL in browser - you should see the documentation)
 - For Claude Desktop, ensure `mcp-remote` is installed: `npx mcp-remote --version`
 
 **Tool returns errors**
