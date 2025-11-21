@@ -2,7 +2,7 @@
 
 [![NPM Version](https://img.shields.io/npm/v/rss-mcp.svg)](https://www.npmjs.com/package/rss-mcp)
 
-A Model Context Protocol (MCP) server for fetching and parsing RSS/Atom feeds with RSSHub support. This server can be deployed to Vercel as a remote MCP server or run locally via stdio.
+A Model Context Protocol (MCP) server for fetching and parsing RSS/Atom feeds with RSSHub support. This server can be deployed to Cloudflare Workers, Vercel, or run locally via stdio.
 
 ## Features
 
@@ -18,7 +18,46 @@ A Model Context Protocol (MCP) server for fetching and parsing RSS/Atom feeds wi
 
 ## Deployment Options
 
-### Option 1: Deploy to Vercel (Recommended)
+### Option 1: Deploy to Cloudflare Workers (Recommended for Global Access)
+
+For the best global accessibility, especially for users in China, deploy to Cloudflare Workers:
+
+**Benefits:**
+- ✅ Better accessibility from China (not blocked by GFW)
+- ✅ Faster cold starts (~50-100ms vs ~100-200ms)
+- ✅ Generous free tier (100,000 requests/day)
+- ✅ True edge computing (300+ global locations)
+
+**Quick Start:**
+
+```bash
+cd workers-rss-mcp
+npx wrangler login
+npm run deploy
+```
+
+📖 **See detailed guide**: [CLOUDFLARE_WORKERS_DEPLOYMENT.md](./CLOUDFLARE_WORKERS_DEPLOYMENT.md)
+
+Your Worker will be available at: `https://workers-rss-mcp.<your-account>.workers.dev`
+
+**Configure Claude Desktop:**
+```json
+{
+  "mcpServers": {
+    "rss": {
+      "command": "npx",
+      "args": [
+        "workers-mcp",
+        "run",
+        "workers-rss-mcp",
+        "https://workers-rss-mcp.<your-account>.workers.dev"
+      ]
+    }
+  }
+}
+```
+
+### Option 2: Deploy to Vercel
 
 #### Method A: One-Click Deploy
 
@@ -83,7 +122,7 @@ In your Vercel project settings, you can optionally set:
 4. Select environment (Production, Preview, Development)
 5. Click "Save" - this will trigger a new deployment
 
-### Option 2: Run Locally via stdio
+### Option 3: Run Locally via stdio
 
 For local development or traditional MCP usage:
 
@@ -100,7 +139,7 @@ npm run build:stdio
 npm run start:stdio
 ```
 
-### Option 3: Use via npx
+### Option 4: Use via npx
 
 ```bash
 npx rss-mcp

@@ -1,0 +1,23 @@
+{
+	"name": "workers-rss-mcp",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"test": "vitest",
+		"cf-typegen": "wrangler types"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "^0.8.19",
+		"typescript": "^5.5.2",
+		"vitest": "~3.2.0",
+		"wrangler": "^4.50.0"
+	},
+	"dependencies": {
+		"fast-xml-parser": "^5.3.2",
+		"workers-mcp": "^0.0.13",
+		"zod": "^4.1.12"
+	}
+}
