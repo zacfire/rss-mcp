@@ -2,6 +2,11 @@ import { createMcpHandler } from 'mcp-handler';
 import { z } from 'zod';
 import { getFeed } from '../../src/lib';
 
+// Vercel Route Segment Config
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
+
 const handler = createMcpHandler(
   (server) => {
     server.tool(
