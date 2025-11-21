@@ -1,6 +1,6 @@
 import { createMcpHandler } from 'mcp-handler';
 import { z } from 'zod';
-import { getFeed } from '../../src/lib';
+import { getFeed } from '../../../src/lib';
 
 // Vercel Route Segment Config
 export const runtime = 'nodejs';
@@ -37,6 +37,7 @@ const handler = createMcpHandler(
   },
   {},
   {
+    basePath: '/api',
     verboseLogs: true,
     maxDuration: 60
   }
