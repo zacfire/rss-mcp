@@ -8,13 +8,11 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "echo '⚠️  For Cloudflare Workers deployment, use: cd workers-rss-mcp && npm run deploy' && exit 0",
     "start": "next start",
     "build:stdio": "tsc",
     "start:stdio": "node dist/index.js",
-    "pages:build": "npx @cloudflare/next-on-pages",
-    "pages:deploy": "npm run pages:build && wrangler pages deploy .vercel/output/static",
-    "pages:dev": "npx wrangler pages dev .vercel/output/static --compatibility-flag=nodejs_compat"
+    "deploy:workers": "cd workers-rss-mcp && npm run deploy"
   },
   "keywords": [
     "mcp",
