@@ -16,8 +16,9 @@
 		"wrangler": "^4.50.0"
 	},
 	"dependencies": {
+		"agents": "^0.2.23",
 		"fast-xml-parser": "^5.3.2",
-		"workers-mcp": "^0.0.13",
-		"zod": "^4.1.12"
+		"zod": "^4.1.12",
+		"zod-to-json-schema": "^3.25.0"
 	}
 }
