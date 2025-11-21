@@ -41,3 +41,6 @@ lerna-debug.log*
 .Trashes
 ehthumbs.db
 Thumbs.db
+# Cloudflare Workers project (deployed separately)
+workers-rss-mcp/node_modules/
+workers-rss-mcp/.wrangler/
