@@ -27,7 +27,7 @@ export default function Home() {
           borderRadius: '4px',
           wordBreak: 'break-all'
         }}>
-          {typeof window !== 'undefined' ? `${window.location.origin}/mcp` : '/mcp'}
+          {typeof window !== 'undefined' ? `${window.location.origin}/api/mcp` : '/api/mcp'}
         </code>
       </section>
 
@@ -80,7 +80,7 @@ export default function Home() {
 {`{
   "mcpServers": {
     "rss": {
-      "url": "${typeof window !== 'undefined' ? window.location.origin : 'https://your-rss-mcp.vercel.app'}/mcp"
+      "url": "${typeof window !== 'undefined' ? window.location.origin : 'https://your-rss-mcp.vercel.app'}/api/mcp"
     }
   }
 }`}
@@ -99,7 +99,7 @@ export default function Home() {
       "command": "npx",
       "args": [
         "mcp-remote",
-        "${typeof window !== 'undefined' ? window.location.origin : 'https://your-rss-mcp.vercel.app'}/mcp"
+        "${typeof window !== 'undefined' ? window.location.origin : 'https://your-rss-mcp.vercel.app'}/api/mcp"
       ]
     }
   }
