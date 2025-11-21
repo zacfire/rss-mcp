@@ -66,6 +66,14 @@ server.tool(
 	}
 );
 
+const handler = createMcpHandler(server, {
+	corsOptions: {
+		allowOrigins: ['*'],
+		allowMethods: ['GET', 'POST', 'OPTIONS'],
+		allowHeaders: ['Content-Type'],
+	},
+});
+
 export default {
-	fetch: createMcpHandler(server),
+	fetch: handler,
 };
