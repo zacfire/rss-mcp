@@ -1,0 +1,23 @@
+{
+  "tools": [
+    {
+      "name": "get_feed",
+      "description": "Get RSS feed from any URL, including RSSHub feeds. This tool fetches and parses RSS/Atom feeds from any URL. It supports RSSHub feeds using the 'rsshub://' protocol and automatically tries multiple RSSHub instances for better reliability.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The URL of the RSS feed. For RSSHub, you can use 'rsshub://' protocol (e.g., 'rsshub://bilibili/user/dynamic/208259'). For regular RSS feeds, use the full URL."
+          },
+          "count": {
+            "type": "number",
+            "description": "Number of RSS feed items to retrieve. Defaults to 1. Set to 0 to retrieve all items.",
+            "default": 1
+          }
+        },
+        "required": ["url"]
+      }
+    }
+  ]
+}
