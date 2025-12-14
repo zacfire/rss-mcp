@@ -68,6 +68,7 @@ server.registerTool(
 );
 
 const handler = createMcpHandler(server, {
+	route: '/',  // 使用根路径，端点直接是 roseau.app/mcp/rss
 	corsOptions: {
 		origin: '*',
 		methods: 'GET, POST, OPTIONS',
