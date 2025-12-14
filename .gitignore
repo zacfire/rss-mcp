@@ -5,6 +5,7 @@
 /dist
 /.next
 /out
+*.tsbuildinfo
 
 # Next.js
 next-env.d.ts
