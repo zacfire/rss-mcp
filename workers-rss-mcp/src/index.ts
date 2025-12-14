@@ -16,29 +16,30 @@ const server = new McpServer({
 	version: '1.0.0',
 });
 
-server.tool(
+server.registerTool(
 	'get_feed',
 	{
-		url: z
-			.string()
-			.describe(
-				"URL of the RSS feed. For RSSHub, you can use 'rsshub://' protocol (e.g., 'rsshub://bilibili/user/dynamic/208259'). For regular RSS feeds, use the full URL."
-			),
-		count: z
-			.number()
-			.optional()
-			.default(1)
-			.describe('Number of RSS feed items to retrieve. Defaults to 1. Set to 0 to retrieve all items.'),
+		description: 'Get RSS feed from any URL, including RSSHub feeds.',
+		inputSchema: {
+			url: z
+				.string()
+				.describe(
+					"URL of the RSS feed. For RSSHub, you can use 'rsshub://' protocol (e.g., 'rsshub://bilibili/user/dynamic/208259'). For regular RSS feeds, use the full URL."
+				),
+			count: z
+				.number()
+				.optional()
+				.default(1)
+				.describe('Number of RSS feed items to retrieve. Defaults to 1. Set to 0 to retrieve all items.'),
+		},
 	},
-	async ({ url, count }, { ctx }) => {
+	async ({ url, count }) => {
 		try {
-			const env = ctx.env as Env;
 			console.log(`Tool called with URL: ${url}, count: ${count}`);
 
 			const feedResult = await getFeed({
 				url,
 				count: count ?? 1,
-				priorityInstance: env.PRIORITY_RSSHUB_INSTANCE,
 			});
 
 			console.log(`Tool completed successfully for URL: ${url}`);
@@ -68,9 +69,9 @@ server.tool(
 
 const handler = createMcpHandler(server, {
 	corsOptions: {
-		allowOrigins: ['*'],
-		allowMethods: ['GET', 'POST', 'OPTIONS'],
-		allowHeaders: ['Content-Type'],
+		origin: '*',
+		methods: 'GET, POST, OPTIONS',
+		headers: 'Content-Type',
 	},
 });
 
