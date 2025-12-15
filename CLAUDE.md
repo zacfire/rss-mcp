@@ -6,67 +6,40 @@ A Model Context Protocol (MCP) server for fetching and parsing RSS/Atom feeds wi
 
 ```
 rss-mcp/
-├── app/                          # Next.js app (Vercel deployment)
-│   ├── api/[transport]/route.ts  # MCP handler using mcp-handler
-│   ├── api/test/route.ts         # Test endpoint
-│   ├── layout.tsx                # Root layout
-│   └── page.tsx                  # Homepage with documentation
 ├── src/
-│   ├── lib/
-│   │   ├── feed-parser.ts        # Core RSS parsing logic
-│   │   ├── rsshub-instances.ts   # RSSHub instance management
-│   │   ├── types.ts              # TypeScript types
-│   │   └── index.ts              # Module exports
-│   ├── index.ts                  # stdio server entry point
-│   └── test.ts                   # Test file
-├── workers-rss-mcp/              # Cloudflare Workers version
-│   ├── src/
-│   │   ├── index.ts              # Workers entry point using agents SDK
-│   │   ├── rss-parser.ts         # Workers RSS parser (fetch API based)
-│   │   ├── rsshub.ts             # RSSHub instance management
-│   │   └── types.ts              # TypeScript types
-│   ├── test/                     # Vitest tests
-│   ├── wrangler.jsonc            # Wrangler config
-│   └── package.json              # Workers dependencies
+│   ├── index.ts              # Workers entry point
+│   ├── rss-parser.ts         # RSS feed parsing logic
+│   ├── opml-parser.ts        # OPML file parser
+│   ├── rsshub.ts             # RSSHub instance management
+│   └── types.ts              # TypeScript types
+├── wrangler.toml             # Cloudflare Workers config
 ├── package.json
-├── tsconfig.json
-└── next.config.mjs
+└── tsconfig.json
 ```
 
-## Deployment Modes
+## Deployment
 
-### 1. Vercel (Next.js)
-- Entry: `app/api/[transport]/route.ts`
-- Uses `mcp-handler` package
-- Run: `npm run dev` (development), `npm run build && npm run start` (production)
+### Cloudflare Workers (Primary)
 
-### 2. Cloudflare Workers
-- Entry: `workers-rss-mcp/src/index.ts`
-- Uses `agents` SDK from Cloudflare
-- Deploy: `cd workers-rss-mcp && npm run deploy`
+```bash
+# Install dependencies
+npm install
 
-### 3. stdio Mode
-- Entry: `src/index.ts`
-- Uses `@modelcontextprotocol/sdk` directly
-- Build: `npm run build:stdio`
-- Run: `npm run start:stdio` or `npx rss-mcp`
+# Deploy
+npx wrangler deploy
+```
 
 ## Key Dependencies
 
-- `@modelcontextprotocol/sdk`: MCP SDK for stdio mode
-- `mcp-handler`: Vercel adapter for MCP
+- `@modelcontextprotocol/sdk`: MCP SDK
 - `agents`: Cloudflare Workers MCP adapter
-- `axios`: HTTP client (Vercel/stdio)
-- `rss-parser`: RSS/Atom feed parser
-- `cheerio`: HTML parsing for content cleaning
+- `fast-xml-parser`: XML parsing
 - `zod`: Schema validation
-- `date-fns-tz`: Timezone-aware date formatting
-- `fast-xml-parser`: XML parsing (Workers version)
 
-## MCP Tool
+## MCP Tools
 
 ### `get_feed`
-Fetches and parses RSS feeds from any URL.
+Fetches and parses a single RSS feed.
 
 **Parameters:**
 - `url` (string, required): RSS feed URL
@@ -75,26 +48,14 @@ Fetches and parses RSS feeds from any URL.
   - Short path: `bilibili/user/dynamic/208259`
 - `count` (number, optional): Number of items to retrieve (default: 1, 0 for all)
 
-## Development Commands
+### `get_feeds`
+Fetches multiple RSS feeds at once. Supports OPML files from Feedly, Inoreader, etc.
 
-```bash
-# Install dependencies
-npm install
-
-# Development server (Vercel)
-npm run dev
-
-# Build stdio version
-npm run build:stdio
-
-# Run stdio server
-npm run start:stdio
-
-# Deploy to Cloudflare Workers
-npm run deploy:workers
-# or
-cd workers-rss-mcp && npm run deploy
-```
+**Parameters:**
+- `opml` (string, optional): OPML file content (XML string)
+- `urls` (array, optional): Array of RSS feed URLs
+- `count` (number, optional): Items per feed (default: 1)
+- `concurrency` (number, optional): Parallel fetches (default: 5)
 
 ## Environment Variables
 

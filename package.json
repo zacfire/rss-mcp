@@ -7,19 +7,15 @@
     "rss-mcp": "dist/index.js"
   },
   "scripts": {
-    "dev": "next dev",
-    "build": "echo '⚠️  For Cloudflare Workers deployment, use: cd workers-rss-mcp && npm run deploy' && exit 0",
-    "start": "next start",
-    "build:stdio": "tsc",
-    "start:stdio": "node dist/index.js",
+    "build": "tsc",
+    "start": "node dist/index.js",
     "deploy:workers": "cd workers-rss-mcp && npm run deploy"
   },
   "keywords": [
     "mcp",
     "rss",
     "rsshub",
-    "model-context-protocol",
-    "vercel"
+    "model-context-protocol"
   ],
   "author": "",
   "license": "Apache-2.0",
@@ -33,21 +29,12 @@
     "date-fns-tz": "^3.1.3",
     "dotenv": "^16.4.5",
     "fast-xml-parser": "^5.3.2",
-    "mcp-handler": "^1.0.3",
-    "next": "^15.5.2",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "rss-parser": "^3.13.0",
-    "workers-mcp": "^0.0.13",
-    "zod": "^3.25.76",
+    "zod": "^3.23.8",
     "zod-to-json-schema": "^3.25.0"
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1.13.16",
     "@types/node": "^20.14.9",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }
 }
