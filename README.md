@@ -1,169 +1,56 @@
 # RSS MCP Server
 
-[![NPM Version](https://img.shields.io/npm/v/rss-mcp.svg)](https://www.npmjs.com/package/rss-mcp)
-
-A Model Context Protocol (MCP) server for fetching and parsing RSS/Atom feeds with RSSHub support. This server can be deployed to Cloudflare Workers, Vercel, or run locally via stdio.
+A Model Context Protocol (MCP) server for fetching and parsing RSS/Atom feeds with RSSHub support. Deploy to Cloudflare Workers for global accessibility.
 
 ## Features
 
 - **Universal Feed Parsing**: Fetch and parse any standard RSS/Atom feed from a given URL.
+- **Batch Feed Fetching**: Fetch multiple feeds at once with OPML support (Feedly, Inoreader, etc.)
 - **Enhanced RSSHub Support**: Fetch any RSSHub-supported feed via MCP, with multi-instance support.
 - **Customizable Item Count**: Specify the number of feed items to retrieve, with support for fetching all items.
 - **Multi-instance Support**: Includes a list of public RSSHub instances and automatically polls to find an available service.
 - **Smart URL Parsing**: Supports standard RSSHub URLs and a simplified `rsshub://` protocol format.
 - **Priority Instance Configuration**: Set a preferred RSSHub instance via the `PRIORITY_RSSHUB_INSTANCE` environment variable.
 - **Robust Error Handling**: If a request to one instance fails, it automatically tries the next one until it succeeds.
-- **Content Cleaning**: Uses Cheerio to clean the feed content and extract plain text descriptions.
-- **Vercel Deployment**: Deploy as a remote MCP server accessible via HTTPS.
 
-## Deployment Options
+## Deployment
 
-### Option 1: Deploy to Cloudflare Workers (Recommended for Global Access)
-
-For the best global accessibility, especially for users in China, deploy to Cloudflare Workers:
+### Deploy to Cloudflare Workers
 
 **Benefits:**
-- ✅ Better accessibility from China (not blocked by GFW)
-- ✅ Faster cold starts (~50-100ms vs ~100-200ms)
-- ✅ Generous free tier (100,000 requests/day)
-- ✅ True edge computing (300+ global locations)
+- Better accessibility from China (not blocked by GFW)
+- Faster cold starts (~50-100ms)
+- Generous free tier (100,000 requests/day)
+- True edge computing (300+ global locations)
 
 **Quick Start:**
 
 ```bash
-cd workers-rss-mcp
-npx wrangler login
-npm run deploy
-```
-
-📖 **See detailed guide**: [CLOUDFLARE_WORKERS_DEPLOYMENT.md](./CLOUDFLARE_WORKERS_DEPLOYMENT.md)
-
-Your Worker will be available at: `https://workers-rss-mcp.<your-account>.workers.dev`
-
-**Configure Claude Desktop:**
-```json
-{
-  "mcpServers": {
-    "rss": {
-      "command": "npx",
-      "args": [
-        "workers-mcp",
-        "run",
-        "workers-rss-mcp",
-        "https://workers-rss-mcp.<your-account>.workers.dev"
-      ]
-    }
-  }
-}
-```
-
-### Option 2: Deploy to Vercel
-
-#### Method A: One-Click Deploy
-
-Deploy with a single click using Vercel's deployment button:
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/zacfire/rss-mcp)
-
-#### Method B: Deploy via Vercel Dashboard
-
-1. Visit [Vercel Dashboard](https://vercel.com/new)
-2. Click "Import Project"
-3. Connect your GitHub account and select the `zacfire/rss-mcp` repository
-4. Select the branch you want to deploy (e.g., `main` or your feature branch)
-5. Vercel will auto-detect Next.js settings
-6. Click "Deploy"
-7. Wait for deployment to complete (usually 1-2 minutes)
-
-After deployment, you'll get:
-- **Production URL**: `https://your-project-name.vercel.app`
-- **MCP Endpoint**: `https://your-project-name.vercel.app` (root path)
-
-**Benefits of Dashboard Deployment:**
-- Auto-deploys on every push to the connected branch
-- Preview deployments for pull requests
-- Easy environment variable management
-- Deployment history and rollback support
-
-#### Method C: Deploy via CLI
-
-For manual deployment from your local machine:
-
-```bash
-# 1. Clone the repository (if not already cloned)
+# Clone the repository
 git clone https://github.com/zacfire/rss-mcp.git
 cd rss-mcp
 
-# 2. Install Vercel CLI globally (first time only)
-npm install -g vercel
-
-# 3. Login to Vercel
-vercel login
-
-# 4. Deploy to preview environment
-vercel
-
-# 5. Deploy to production
-vercel --prod
-```
-
-#### Setting Environment Variables
-
-In your Vercel project settings, you can optionally set:
-
-- **`PRIORITY_RSSHUB_INSTANCE`**: Your preferred RSSHub instance URL
-  - Example: `https://my-rsshub.example.com`
-  - This instance will be tried first before falling back to public instances
-
-**How to set environment variables:**
-1. Go to your project in Vercel Dashboard
-2. Navigate to Settings → Environment Variables
-3. Add `PRIORITY_RSSHUB_INSTANCE` with your value
-4. Select environment (Production, Preview, Development)
-5. Click "Save" - this will trigger a new deployment
-
-### Option 3: Run Locally via stdio
-
-For local development or traditional MCP usage:
-
-```bash
-# Clone and install
-git clone https://github.com/zacfire/rss-mcp.git
-cd rss-mcp
+# Install dependencies
 npm install
 
-# Build for stdio mode
-npm run build:stdio
+# Login to Cloudflare
+npx wrangler login
 
-# Run the server
-npm run start:stdio
+# Deploy
+npx wrangler deploy
 ```
 
-### Option 4: Use via npx
+Your Worker will be available at: `https://rss-mcp.<your-account>.workers.dev`
 
-```bash
-npx rss-mcp
-```
+**Custom Domain (Recommended for China):**
+
+Add a custom domain in Cloudflare Dashboard → Workers → Your Worker → Settings → Triggers → Custom Domains.
 
 ## MCP Client Configuration
 
-### For Cursor (Remote Server)
+### For Claude Desktop
 
-Add to your Cursor settings (`~/.cursor/mcp.json`):
-
-```json
-{
-  "mcpServers": {
-    "rss": {
-      "url": "https://your-rss-mcp.vercel.app"
-    }
-  }
-}
-```
-
-### For Claude Desktop (Remote Server)
-
-Claude Desktop requires `mcp-remote` to connect to remote servers. Add to your Claude Desktop config:
+Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 
 ```json
 {
@@ -172,46 +59,34 @@ Claude Desktop requires `mcp-remote` to connect to remote servers. Add to your C
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://your-rss-mcp.vercel.app"
+        "https://your-custom-domain.com/rss"
       ]
     }
   }
 }
 ```
 
-### For Local stdio Mode
+### For Cursor
+
+Add to your Cursor settings (`~/.cursor/mcp.json`):
 
 ```json
 {
   "mcpServers": {
     "rss": {
-      "command": "npx",
-      "args": ["rss-mcp"]
+      "url": "https://your-custom-domain.com/rss"
     }
   }
 }
 ```
 
-Or with a local installation:
-
-```json
-{
-  "mcpServers": {
-    "rss": {
-      "command": "node",
-      "args": ["/path/to/your/rss-mcp/dist/index.js"]
-    }
-  }
-}
-```
-
-## Tool Definition
+## MCP Tools
 
 ### `get_feed`
 
-Fetches and parses an RSS feed from a given URL. It supports both standard RSS/Atom feeds and RSSHub feeds.
+Fetches and parses a single RSS feed from a given URL.
 
-#### Input Parameters
+**Input Parameters:**
 
 - `url` (string, required): The URL of the RSS feed to fetch. Supported formats:
     1. **Standard URL**: `https://rsshub.app/bilibili/user/dynamic/208259`
@@ -221,21 +96,19 @@ Fetches and parses an RSS feed from a given URL. It supports both standard RSS/A
     - **Default**: `1`
     - **Retrieve all**: `0`
 
-#### Output
-
-Returns a JSON string containing the feed information:
+**Output:**
 
 ```json
 {
-  "title": "bilibili User Dynamics",
-  "link": "https://space.bilibili.com/208259",
-  "description": "bilibili User Dynamics",
+  "title": "Feed Title",
+  "link": "https://example.com",
+  "description": "Feed description",
   "items": [
     {
-      "title": "[Dynamic Title]",
-      "description": "Plain text content of the dynamic...",
-      "link": "https://t.bilibili.com/1234567890",
-      "guid": "https://t.bilibili.com/1234567890",
+      "title": "Article Title",
+      "description": "Plain text content...",
+      "link": "https://example.com/article",
+      "guid": "https://example.com/article",
       "pubDate": "2024-05-20T12:30:00.000Z",
       "author": "Author Name",
       "category": ["Category1", "Category2"]
@@ -244,135 +117,91 @@ Returns a JSON string containing the feed information:
 }
 ```
 
-## Local Development
+### `get_feeds`
 
-```bash
-# Install dependencies
-npm install
+Fetches multiple RSS feeds at once. Supports OPML files exported from Feedly, Inoreader, etc.
 
-# Run development server
-npm run dev
+**Input Parameters:**
 
-# The server will be available at http://localhost:3000
-# MCP endpoint: http://localhost:3000/api
+- `opml` (string, optional): OPML file content (XML string) exported from RSS readers
+- `urls` (array, optional): Array of RSS feed URLs to fetch
+- `count` (number, optional): Number of items to retrieve per feed. Default: `1`
+- `concurrency` (number, optional): Number of feeds to fetch in parallel. Default: `5`
+
+**Output:**
+
+```json
+{
+  "total": 10,
+  "successful": 8,
+  "failed": 2,
+  "feeds": [
+    {
+      "title": "Feed Title",
+      "url": "https://example.com/feed.xml",
+      "category": "Technology",
+      "items": [...]
+    }
+  ],
+  "errors": [
+    {
+      "title": "Failed Feed",
+      "url": "https://example.com/broken.xml",
+      "error": "Error message"
+    }
+  ]
+}
 ```
 
 ## Project Structure
 
 ```
 rss-mcp/
-├── app/
-│   ├── [transport]/
-│   │   └── route.ts            # MCP handler (required dynamic route)
-│   ├── layout.tsx              # Root layout
-│   └── page.tsx                # Homepage with API documentation
 ├── src/
-│   ├── lib/
-│   │   ├── feed-parser.ts      # Core RSS parsing logic
-│   │   ├── rsshub-instances.ts # RSSHub instance management
-│   │   ├── types.ts            # TypeScript types
-│   │   └── index.ts            # Module exports
-│   └── index.ts                # stdio server entry point
-├── public/
-│   └── .gitkeep                # Keep public directory in git
-├── .env.example
-├── next.config.mjs             # Next.js configuration
+│   ├── index.ts          # Workers entry point
+│   ├── rss-parser.ts     # RSS feed parsing logic
+│   ├── opml-parser.ts    # OPML file parser
+│   ├── rsshub.ts         # RSSHub instance management
+│   └── types.ts          # TypeScript types
+├── wrangler.toml         # Cloudflare Workers config
 ├── package.json
-├── tsconfig.json
-└── README.md
+└── tsconfig.json
 ```
+
+## Environment Variables
+
+- `PRIORITY_RSSHUB_INSTANCE`: Your preferred RSSHub instance URL (optional)
+  - Example: `https://my-rsshub.example.com`
+  - This instance will be tried first before falling back to public instances
+
+Set via Cloudflare Dashboard or `wrangler secret put PRIORITY_RSSHUB_INSTANCE`.
 
 ## Main Dependencies
 
-- [mcp-handler](https://www.npmjs.com/package/mcp-handler): Vercel adapter for MCP servers
 - [@modelcontextprotocol/sdk](https://www.npmjs.com/package/@modelcontextprotocol/sdk): MCP SDK
-- [next](https://www.npmjs.com/package/next): React framework for production
-- [axios](https://www.npmjs.com/package/axios): HTTP client
-- [rss-parser](https://www.npmjs.com/package/rss-parser): RSS/Atom feed parser
-- [cheerio](https://www.npmjs.com/package/cheerio): HTML parser for content cleaning
-- [date-fns-tz](https://www.npmjs.com/package/date-fns-tz): Timezone-aware date formatting
+- [agents](https://www.npmjs.com/package/agents): Cloudflare Workers MCP adapter
+- [fast-xml-parser](https://www.npmjs.com/package/fast-xml-parser): XML parsing
 - [zod](https://www.npmjs.com/package/zod): Schema validation
-
-## Verifying Your Deployment
-
-After deploying to Vercel, verify that everything works:
-
-### 1. Check the Homepage
-
-Visit your deployment URL (e.g., `https://your-project-name.vercel.app`)
-
-You should see:
-- Server name and description
-- MCP endpoint URL
-- Available tools documentation
-- Client configuration examples
-
-### 2. Test the MCP Endpoint
-
-The MCP endpoint is available at: `https://your-project-name.vercel.app` (root path)
-
-You can test it by:
-1. Adding it to your MCP client configuration (Cursor or Claude Desktop)
-2. Trying the `get_feed` tool with a test URL
-
-### 3. Example Test
-
-In Cursor or Claude Desktop, try:
-```
-Use the rss tool to get the feed from: rsshub://github/issue/anthropics/anthropic-sdk-typescript
-```
 
 ## Troubleshooting
 
-### Vercel Deployment Issues
+### Deployment Issues
 
-**Error: "No Output Directory named 'public' found"**
-- Solution: The `public` directory should be auto-created. If missing, run:
-  ```bash
-  mkdir public
-  git add public
-  git commit -m "Add public directory"
-  git push
-  ```
-
-**Error: "Build failed" or TypeScript errors**
-- Check the build logs in Vercel Dashboard
+**Error: "Could not resolve module"**
 - Ensure all dependencies are installed: `npm install`
-- Test locally first: `npm run build`
-
-**Error: "Function timeout"**
-- Some RSS feeds may take longer to fetch
-- The route handler uses `maxDuration: 60` seconds by default
-- For Vercel Pro accounts, you can increase this limit in the mcp-handler options
+- Check that `package.json` includes all required dependencies
 
 ### MCP Connection Issues
 
 **Client can't connect to the server**
-- Verify the URL is correct: `https://your-project-name.vercel.app`
-- Check that the deployment is live (visit the URL in browser - you should see the documentation)
-- For Claude Desktop, ensure `mcp-remote` is installed: `npx mcp-remote --version`
+- Verify the URL is correct
+- If using `workers.dev` domain from China, use a custom domain instead
+- For Claude Desktop, ensure `mcp-remote` is installed
 
 **Tool returns errors**
-- Check Vercel function logs in Dashboard → Deployments → [Latest] → Functions
+- Check Cloudflare Workers logs in Dashboard
 - Verify the RSS/RSSHub URL is accessible
 - Try a different RSSHub instance by setting `PRIORITY_RSSHUB_INSTANCE`
-
-### Local Development Issues
-
-**Port 3000 already in use**
-- Change the port: `PORT=3001 npm run dev`
-- Or kill the process using port 3000
-
-**TypeScript errors during development**
-- Run `npm install` to ensure all type definitions are installed
-- Check that `tsconfig.json` is properly configured
-
-## Performance Notes
-
-- **Cold Starts**: First request after inactivity may take 2-3 seconds (Vercel serverless warm-up)
-- **Timeout**: RSS fetching has a 15-second timeout per instance, 60-second function limit
-- **RSSHub Fallback**: If one instance fails, it automatically tries the next one
-- **Caching**: Consider implementing caching for frequently accessed feeds
 
 ## License
 
