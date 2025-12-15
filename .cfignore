@@ -1,3 +1,0 @@
-# Cloudflare Pages should not build the workers-rss-mcp directory
-# That directory is for Cloudflare Workers deployment only
-workers-rss-mcp/
