@@ -7,50 +7,34 @@ A Model Context Protocol (MCP) server for fetching and parsing RSS/Atom feeds wi
 ```
 rss-mcp/
 ├── src/
-│   ├── lib/
-│   │   ├── feed-parser.ts        # Core RSS parsing logic
-│   │   ├── rsshub-instances.ts   # RSSHub instance management
-│   │   ├── types.ts              # TypeScript types
-│   │   └── index.ts              # Module exports
-│   ├── index.ts                  # stdio server entry point
-│   └── test.ts                   # Test file
-├── workers-rss-mcp/              # Cloudflare Workers version
-│   ├── src/
-│   │   ├── index.ts              # Workers entry point using agents SDK
-│   │   ├── rss-parser.ts         # Workers RSS parser (fetch API based)
-│   │   ├── opml-parser.ts        # OPML file parser
-│   │   ├── rsshub.ts             # RSSHub instance management
-│   │   └── types.ts              # TypeScript types
-│   ├── test/                     # Vitest tests
-│   ├── wrangler.jsonc            # Wrangler config
-│   └── package.json              # Workers dependencies
+│   ├── index.ts              # Workers entry point
+│   ├── rss-parser.ts         # RSS feed parsing logic
+│   ├── opml-parser.ts        # OPML file parser
+│   ├── rsshub.ts             # RSSHub instance management
+│   └── types.ts              # TypeScript types
+├── wrangler.toml             # Cloudflare Workers config
 ├── package.json
 └── tsconfig.json
 ```
 
-## Deployment Modes
+## Deployment
 
-### 1. Cloudflare Workers (Recommended)
-- Entry: `workers-rss-mcp/src/index.ts`
-- Uses `agents` SDK from Cloudflare
-- Deploy: `cd workers-rss-mcp && npm run deploy`
+### Cloudflare Workers (Primary)
 
-### 2. stdio Mode
-- Entry: `src/index.ts`
-- Uses `@modelcontextprotocol/sdk` directly
-- Build: `npm run build`
-- Run: `npm run start` or `npx rss-mcp`
+```bash
+# Install dependencies
+npm install
+
+# Deploy
+npx wrangler deploy
+```
 
 ## Key Dependencies
 
-- `@modelcontextprotocol/sdk`: MCP SDK for stdio mode
+- `@modelcontextprotocol/sdk`: MCP SDK
 - `agents`: Cloudflare Workers MCP adapter
-- `axios`: HTTP client (stdio mode)
-- `rss-parser`: RSS/Atom feed parser
-- `cheerio`: HTML parsing for content cleaning
+- `fast-xml-parser`: XML parsing
 - `zod`: Schema validation
-- `date-fns-tz`: Timezone-aware date formatting
-- `fast-xml-parser`: XML parsing (Workers version)
 
 ## MCP Tools
 
@@ -72,24 +56,6 @@ Fetches multiple RSS feeds at once. Supports OPML files from Feedly, Inoreader, 
 - `urls` (array, optional): Array of RSS feed URLs
 - `count` (number, optional): Items per feed (default: 1)
 - `concurrency` (number, optional): Parallel fetches (default: 5)
-
-## Development Commands
-
-```bash
-# Install dependencies
-npm install
-
-# Build stdio version
-npm run build
-
-# Run stdio server
-npm run start
-
-# Deploy to Cloudflare Workers
-npm run deploy:workers
-# or
-cd workers-rss-mcp && npm run deploy
-```
 
 ## Environment Variables
 

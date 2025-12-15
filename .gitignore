@@ -3,12 +3,10 @@
 
 # Build output
 /dist
-/.next
-/out
 *.tsbuildinfo
 
-# Next.js
-next-env.d.ts
+# Wrangler
+.wrangler/
 
 # Logs
 logs
@@ -16,7 +14,6 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-lerna-debug.log*
 
 # Environment variables
 .env
@@ -42,6 +39,3 @@ lerna-debug.log*
 .Trashes
 ehthumbs.db
 Thumbs.db
-# Cloudflare Workers project (deployed separately)
-workers-rss-mcp/node_modules/
-workers-rss-mcp/.wrangler/
